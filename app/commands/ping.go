@@ -2,20 +2,22 @@ package commands
 
 import (
 	"fmt"
+
 	"github.com/bwmarrin/discordgo"
-	"stewart-bot/app/config"
-	"stewart-bot/app/utils"
+
+	"github.com/Mispon/stewart-bot/app/config"
+	"github.com/Mispon/stewart-bot/app/utils"
 )
 
-type PingProcessor struct {}
+type PingProcessor struct{}
 
 // Check checks if a module needs to be executed
 func (p PingProcessor) Check(message *discordgo.MessageCreate, _ bool) bool {
-	return utils.HasAnyOf(message.Content, []string { "ping", "pong" })
+	return utils.HasAnyOf(message.Content, []string{"ping", "pong"})
 }
 
 // Execute runs module logic
-func (p PingProcessor) Execute(message *discordgo.MessageCreate, session *discordgo.Session)  {
+func (p PingProcessor) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
 	cfg := config.GetConfig()
 	var answer string
 	if message.Content == "ping" {
@@ -23,5 +25,5 @@ func (p PingProcessor) Execute(message *discordgo.MessageCreate, session *discor
 	} else {
 		answer = fmt.Sprintf("%s ping!", cfg.Author)
 	}
-	session.ChannelMessageSend(message.ChannelID, answer)
+	_, _ = session.ChannelMessageSend(message.ChannelID, answer)
 }

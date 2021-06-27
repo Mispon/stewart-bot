@@ -10,8 +10,8 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
-	"stewart-bot/app/commands"
-	"stewart-bot/app/config"
+	"github.com/Mispon/stewart-bot/app/commands"
+	"github.com/Mispon/stewart-bot/app/config"
 )
 
 var (
@@ -23,7 +23,7 @@ var (
 func init() {
 	flag.BoolVar(&DebugMode, "debug", false, "-debug")
 	flag.StringVar(&Token, "token", "", "-token=my_bot_token")
-	flag.StringVar(&ConfigPath, "config", "./config.yml", "-config=./config.yml")
+	flag.StringVar(&ConfigPath, "config", "app/config.yml", "-config=app/config.yml")
 
 	flag.Parse()
 }
@@ -57,7 +57,7 @@ func main() {
 	fmt.Printf("Stewart v%s successfully started!", config.GetConfig().Version)
 
 	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
 
 	discord.Close()

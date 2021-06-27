@@ -1,0 +1,15 @@
+author: "Mispon"
+version: "1.0.0"
+bot_names: [ "stew", "стю" ]
+
+commands:
+  joke: [ "шутк", "шути", "рофл", "ржаку", "прекол" ]
+  quote: [ "цитат", "мудро", "ебани" ]
+  horoscope: [ "гороскоп", "вангуй" ]
+
+joke_url: "http://rzhunemogu.ru/RandJSON.aspx?CType=1"
+quote_url: "https://api.forismatic.com/api/1.0/?method=getQuote&format=json"
+horoscope_url: "https://www.stardm.com/daily-horoscopes/Y-russian-daily-horoscopes.asp"
+metacritic:
+  games_url: "https://www.metacritic.com/rss/games/pc"
+  movies_url: "https://www.metacritic.com/rss/movies"

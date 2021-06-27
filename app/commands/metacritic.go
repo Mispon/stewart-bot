@@ -2,35 +2,39 @@ package commands
 
 import (
 	"fmt"
-	"github.com/bwmarrin/discordgo"
-	"github.com/mmcdole/gofeed"
-	"stewart-bot/app/config"
-	"stewart-bot/app/utils"
 	"strings"
 	"time"
+
+	"github.com/bwmarrin/discordgo"
+	"github.com/mmcdole/gofeed"
+	"github.com/rs/zerolog/log"
+
+	"github.com/Mispon/stewart-bot/app/config"
+	"github.com/Mispon/stewart-bot/app/utils"
 )
 
-type MetacriticProcessor struct {}
+type MetacriticProcessor struct{}
 
 // Check checks if a module needs to be executed
 func (p MetacriticProcessor) Check(message *discordgo.MessageCreate, _ bool) bool {
-	return utils.HasAnyOf(message.Content, []string { "что нового" })
+	return utils.HasAnyOf(message.Content, []string{"что нового"})
 }
 
 // Execute runs module logic
-func (p MetacriticProcessor) Execute(message *discordgo.MessageCreate, session *discordgo.Session)  {
+func (p MetacriticProcessor) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
 	cfg := config.GetConfig()
 
 	rssUrl := getRSSUrl(message.Content, cfg)
 	if len(rssUrl) == 0 {
-		session.ChannelMessageSend(message.ChannelID, "Уточни где? В играх, в фильмах?")
+		_, _ = session.ChannelMessageSend(message.ChannelID, "Уточни где? В играх, в фильмах?")
 		return
 	}
 
 	fp := gofeed.NewParser()
 	feed, err := fp.ParseURL(rssUrl)
 	if err != nil {
-		session.ChannelMessageSend(message.ChannelID, err.Error())
+		_, _ = session.ChannelMessageSend(message.ChannelID, err.Error())
+		log.Error().Err(err).Str("metacritic", "failed to parse RSS url").Send()
 		return
 	}
 
@@ -39,13 +43,16 @@ func (p MetacriticProcessor) Execute(message *discordgo.MessageCreate, session *
 	for i, item := range feed.Items[:5] {
 		pubTime, _ := time.Parse(time.RFC1123Z, item.Published)
 
-		sb.WriteString(fmt.Sprintf("%v. **%s**\n", i + 1, item.Title))
+		sb.WriteString(fmt.Sprintf("%v. **%s**\n", i+1, item.Title))
 		sb.WriteString(fmt.Sprintf("%v\n", cutDescription(item.Description)))
 		sb.WriteString(fmt.Sprintf("%v\n", item.Link))
 		sb.WriteString(fmt.Sprintf("%v\n\n", pubTime.Format("2006-01-02")))
 	}
 
-	session.ChannelMessageSend(message.ChannelID, sb.String())
+	_, err = session.ChannelMessageSend(message.ChannelID, sb.String())
+	if err != nil {
+		log.Error().Err(err).Str("metacritic", "failed to send message to channel").Send()
+	}
 }
 
 func cutDescription(itemDesc string) string {
@@ -61,7 +68,7 @@ func getRSSUrl(message string, cfg *config.Config) string {
 		return cfg.Metacritic.GamesUrl
 	}
 
-	if utils.HasAnyOf(message, []string {"кино", "фильм"}) {
+	if utils.HasAnyOf(message, []string{"кино", "фильм"}) {
 		return cfg.Metacritic.MoviesUrl
 	}
 

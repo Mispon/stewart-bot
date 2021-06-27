@@ -1,19 +1,20 @@
 package commands
 
 import (
+	"io/ioutil"
+	"strings"
+
+	"github.com/rs/zerolog/log"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
-	"io/ioutil"
-	"log"
-	"strings"
 
 	"github.com/bwmarrin/discordgo"
 
-	"stewart-bot/app/config"
-	"stewart-bot/app/utils"
+	"github.com/Mispon/stewart-bot/app/config"
+	"github.com/Mispon/stewart-bot/app/utils"
 )
 
-type JokeProcessor struct {}
+type JokeProcessor struct{}
 
 // Check checks if a module needs to be executed
 func (p JokeProcessor) Check(message *discordgo.MessageCreate, wasAsked bool) bool {
@@ -22,19 +23,19 @@ func (p JokeProcessor) Check(message *discordgo.MessageCreate, wasAsked bool) bo
 }
 
 // Execute runs module logic
-func (p JokeProcessor) Execute(message *discordgo.MessageCreate, session *discordgo.Session)  {
+func (p JokeProcessor) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
 	cfg := config.GetConfig()
 
 	res, err := utils.MakeHTTPRequest(cfg.JokeUrl)
 	if err != nil {
-		log.Printf("[WARN] failed to make request %s, error=%v", cfg.JokeUrl, err)
+		log.Error().Err(err).Msgf("failed to make request %s to API", cfg.JokeUrl)
 		return
 	}
 	defer res.Body.Close()
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Printf("[WARN] failed to read body, error=%v", err)
+		log.Error().Err(err).Str("joke", "failed to read response body").Send()
 		return
 	}
 
@@ -45,9 +46,12 @@ func (p JokeProcessor) Execute(message *discordgo.MessageCreate, session *discor
 	tr := transform.NewReader(strings.NewReader(text), charmap.Windows1251.NewDecoder())
 	buf, err := ioutil.ReadAll(tr)
 	if err != nil {
-		log.Printf("[WARN] failed to convert string to utf, error=%v", err)
+		log.Error().Err(err).Str("joke", "failed to convert string to utf").Send()
 		return
 	}
 
-	session.ChannelMessageSend(message.ChannelID, string(buf))
+	_, err = session.ChannelMessageSend(message.ChannelID, string(buf))
+	if err != nil {
+		log.Error().Err(err).Str("joke", "failed to send message to channel").Send()
+	}
 }

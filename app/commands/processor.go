@@ -6,8 +6,8 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
-	"stewart-bot/app/config"
-	"stewart-bot/app/utils"
+	"github.com/Mispon/stewart-bot/app/config"
+	"github.com/Mispon/stewart-bot/app/utils"
 )
 
 type MessageProcessor interface {

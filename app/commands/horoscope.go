@@ -2,21 +2,21 @@ package commands
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
 	"strings"
 
 	"github.com/antchfx/htmlquery"
 	"github.com/bwmarrin/discordgo"
+	"github.com/rs/zerolog/log"
 
-	"stewart-bot/app/config"
-	"stewart-bot/app/utils"
+	"github.com/Mispon/stewart-bot/app/config"
+	"github.com/Mispon/stewart-bot/app/utils"
 )
 
-type HoroscopeProcessor struct {}
+type HoroscopeProcessor struct{}
 
 type HoroscopeItem struct {
-	Header 	string
+	Header  string
 	Content string
 }
 
@@ -31,7 +31,7 @@ func (p HoroscopeProcessor) Check(message *discordgo.MessageCreate, askedMe bool
 }
 
 // Execute runs module logic
-func (p HoroscopeProcessor) Execute(message *discordgo.MessageCreate, session *discordgo.Session)  {
+func (p HoroscopeProcessor) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
 	cfg := config.GetConfig()
 
 	horoscope := getHoroscope(cfg.HoroscopeUrl)
@@ -39,14 +39,17 @@ func (p HoroscopeProcessor) Execute(message *discordgo.MessageCreate, session *d
 	ri := rand.Intn(len(horoscope))
 	rh := fmt.Sprintf("%v", horoscope[ri])
 
-	session.ChannelMessageSend(message.ChannelID, rh)
+	_, err := session.ChannelMessageSend(message.ChannelID, rh)
+	if err != nil {
+		log.Error().Err(err).Str("horoscope", "failed to send message to channel").Send()
+	}
 }
 
 // getHoroscope returns list of daily horoscopes
 func getHoroscope(url string) (horoscope []HoroscopeItem) {
 	doc, err := htmlquery.LoadURL(url)
 	if err != nil {
-		log.Printf("[WARN] failed to get doc, error=%v", err)
+		log.Error().Err(err).Str("horoscope", "failed to get doc").Send()
 	}
 
 	entry := htmlquery.FindOne(doc, "//div[@class='entry']")
@@ -57,7 +60,7 @@ func getHoroscope(url string) (horoscope []HoroscopeItem) {
 	horoscope = make([]HoroscopeItem, count)
 	for i := 0; i < count; i++ {
 		hi := HoroscopeItem{
-			Header: htmlquery.InnerText(headers[i]),
+			Header:  htmlquery.InnerText(headers[i]),
 			Content: htmlquery.InnerText(contents[i]),
 		}
 		horoscope[i] = hi
