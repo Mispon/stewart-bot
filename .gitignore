@@ -18,3 +18,4 @@
 bin/
 vendor.protogen/
 *tmp/
+/.idea
