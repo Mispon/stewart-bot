@@ -1,3 +1,3 @@
 # stewart-bot
 
-Personal discord bot written on Go with cool things
+Personal discord bot written on Go
