@@ -3,13 +3,12 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Mispon/stewart-bot/internal/config"
+	utils2 "github.com/Mispon/stewart-bot/internal/utils"
 	"io/ioutil"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
-
-	"github.com/Mispon/stewart-bot/app/config"
-	"github.com/Mispon/stewart-bot/app/utils"
 )
 
 type QuoteProcessor struct{}
@@ -17,14 +16,14 @@ type QuoteProcessor struct{}
 // Check checks if a module needs to be executed
 func (p QuoteProcessor) Check(message *discordgo.MessageCreate, wasAsked bool) bool {
 	cfg := config.GetConfig()
-	return wasAsked && utils.HasAnyOf(message.Content, cfg.Commands.Quote)
+	return wasAsked && utils2.HasAnyOf(message.Content, cfg.Commands.Quote)
 }
 
 // Execute runs module logic
 func (p QuoteProcessor) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
 	cfg := config.GetConfig()
 
-	res, err := utils.MakeHTTPRequest(cfg.QuoteUrl)
+	res, err := utils2.MakeHTTPRequest(cfg.QuoteUrl)
 	if err != nil {
 		log.Error().Err(err).Msgf("failed to make request %s", cfg.QuoteUrl)
 		return

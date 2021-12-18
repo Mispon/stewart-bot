@@ -3,15 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/Mispon/stewart-bot/internal/commands"
+	"github.com/Mispon/stewart-bot/internal/config"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"syscall"
 
 	"github.com/bwmarrin/discordgo"
-
-	"github.com/Mispon/stewart-bot/app/commands"
-	"github.com/Mispon/stewart-bot/app/config"
 )
 
 var (
@@ -23,7 +22,7 @@ var (
 func init() {
 	flag.BoolVar(&DebugMode, "debug", false, "-debug")
 	flag.StringVar(&Token, "token", "", "-token=my_bot_token")
-	flag.StringVar(&ConfigPath, "config", "app/config.yml", "-config=app/config.yml")
+	flag.StringVar(&ConfigPath, "config", "config.yml", "-config=config.yml")
 
 	flag.Parse()
 }

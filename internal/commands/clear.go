@@ -1,10 +1,9 @@
 package commands
 
 import (
+	"github.com/Mispon/stewart-bot/internal/utils"
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
-
-	"github.com/Mispon/stewart-bot/app/utils"
 )
 
 type ClearProcessor struct{}

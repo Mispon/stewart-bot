@@ -2,15 +2,14 @@ package commands
 
 import (
 	"fmt"
+	"github.com/Mispon/stewart-bot/internal/config"
+	"github.com/Mispon/stewart-bot/internal/utils"
 	"math/rand"
 	"strings"
 
 	"github.com/antchfx/htmlquery"
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
-
-	"github.com/Mispon/stewart-bot/app/config"
-	"github.com/Mispon/stewart-bot/app/utils"
 )
 
 type HoroscopeProcessor struct{}

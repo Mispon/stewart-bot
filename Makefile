@@ -7,14 +7,14 @@ help:
 .PHONY: generate
 ## generate: runs `go generate`
 generate:
-	@go generate ./app/...
+	@go generate ./...
 
 .PHONY: build
 ## build: builds server
 build:
 	@cd app &&\
-	 go build -v -mod=vendor -o ../build/stewart &&\
-	 cp config.yml ../build/
+	 go build -v -mod=vendor -o bin/stewart &&\
+	 cp config.yml build/
 
 .PHONY: vendor
 ## vendor: runs `go mod vendor`
@@ -24,15 +24,15 @@ vendor:
 .PHONY: test
 ## test: runs `go test`
 test:
-	@go test -mod=vendor ./app/...
+	@go test -mod=vendor ./...
 
 .PHONY: lint
 ## lint: runs `golangci-lint`
 lint:
-	@golangci-lint run ./app/...
+	@golangci-lint run ./...
 
 .PHONY: run
 ## run: runs app locally (don't forget to set all required environment variables)
 run:
-	@go run -v -mod=vendor app/main.go --debug ${ARGS}
+	@go run -v -mod=vendor cmd/bot/main.go --debug ${ARGS}
 

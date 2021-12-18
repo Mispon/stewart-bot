@@ -1,13 +1,12 @@
 package commands
 
 import (
+	"github.com/Mispon/stewart-bot/internal/config"
+	"github.com/Mispon/stewart-bot/internal/utils"
 	"regexp"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-
-	"github.com/Mispon/stewart-bot/app/config"
-	"github.com/Mispon/stewart-bot/app/utils"
 )
 
 type MessageProcessor interface {
