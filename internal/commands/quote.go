@@ -3,36 +3,40 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Mispon/stewart-bot/internal/config"
-	utils2 "github.com/Mispon/stewart-bot/internal/utils"
 	"io/ioutil"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/rs/zerolog/log"
+	"github.com/sirupsen/logrus"
+
+	"github.com/mispon/stewart-bot/internal/config"
+	"github.com/mispon/stewart-bot/internal/utils"
 )
 
-type QuoteProcessor struct{}
+type QuoteCommand struct {
+	config *config.Config
+}
 
 // Check checks if a module needs to be executed
-func (p QuoteProcessor) Check(message *discordgo.MessageCreate, wasAsked bool) bool {
-	cfg := config.GetConfig()
-	return wasAsked && utils2.HasAnyOf(message.Content, cfg.Commands.Quote)
+func (p QuoteCommand) Check(message *discordgo.MessageCreate, wasAsked bool) bool {
+	return wasAsked && utils.HasAnyOf(message.Content, p.config.Commands.Quote)
 }
 
 // Execute runs module logic
-func (p QuoteProcessor) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
-	cfg := config.GetConfig()
-
-	res, err := utils2.MakeHTTPRequest(cfg.QuoteUrl)
+func (p QuoteCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
+	res, err := utils.MakeHTTPRequest(p.config.QuoteUrl)
 	if err != nil {
-		log.Error().Err(err).Msgf("failed to make request %s", cfg.QuoteUrl)
+		logrus.
+			WithField("command", "quote").
+			Errorf("failed to make request %s", p.config.QuoteUrl)
 		return
 	}
-	defer res.Body.Close()
+	defer utils.Close(res.Body.Close)
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Error().Err(err).Str("quote", "failed to read response body").Send()
+		logrus.
+			WithField("command", "quote").
+			Error("failed to read response body")
 		return
 	}
 
@@ -41,7 +45,9 @@ func (p QuoteProcessor) Execute(message *discordgo.MessageCreate, session *disco
 		QuoteAuthor string
 	}{}
 	if err = json.Unmarshal(body, &quote); err != nil {
-		log.Error().Err(err).Str("quote", "failed to deserialize json body").Send()
+		logrus.
+			WithField("command", "quote").
+			Error("failed to deserialize json body")
 	}
 
 	text := fmt.Sprintf(`*%s*`, quote.QuoteText)
@@ -51,6 +57,13 @@ func (p QuoteProcessor) Execute(message *discordgo.MessageCreate, session *disco
 
 	_, err = session.ChannelMessageSend(message.ChannelID, text)
 	if err != nil {
-		log.Error().Err(err).Str("quote", "failed to send message to channel").Send()
+		logrus.
+			WithField("command", "quote").
+			Error("failed to send message to channel")
 	}
+}
+
+// WithConfig setup config pointer
+func (p *QuoteCommand) WithConfig(cfg *config.Config) {
+	p.config = cfg
 }

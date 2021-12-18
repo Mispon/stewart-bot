@@ -2,28 +2,29 @@ package commands
 
 import (
 	"fmt"
-	"github.com/Mispon/stewart-bot/internal/config"
-	"github.com/Mispon/stewart-bot/internal/utils"
 	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/mmcdole/gofeed"
-	"github.com/rs/zerolog/log"
+	"github.com/sirupsen/logrus"
+
+	"github.com/mispon/stewart-bot/internal/config"
+	"github.com/mispon/stewart-bot/internal/utils"
 )
 
-type MetacriticProcessor struct{}
+type MetacriticCommand struct {
+	config *config.Config
+}
 
 // Check checks if a module needs to be executed
-func (p MetacriticProcessor) Check(message *discordgo.MessageCreate, _ bool) bool {
+func (p MetacriticCommand) Check(message *discordgo.MessageCreate, _ bool) bool {
 	return utils.HasAnyOf(message.Content, []string{"что нового"})
 }
 
 // Execute runs module logic
-func (p MetacriticProcessor) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
-	cfg := config.GetConfig()
-
-	rssUrl := getRSSUrl(message.Content, cfg)
+func (p MetacriticCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
+	rssUrl := getRSSUrl(message.Content, p.config)
 	if len(rssUrl) == 0 {
 		_, _ = session.ChannelMessageSend(message.ChannelID, "Уточни где? В играх, в фильмах?")
 		return
@@ -33,7 +34,9 @@ func (p MetacriticProcessor) Execute(message *discordgo.MessageCreate, session *
 	feed, err := fp.ParseURL(rssUrl)
 	if err != nil {
 		_, _ = session.ChannelMessageSend(message.ChannelID, err.Error())
-		log.Error().Err(err).Str("metacritic", "failed to parse RSS url").Send()
+		logrus.
+			WithField("command", "metacritic").
+			Error("failed to parse RSS url")
 		return
 	}
 
@@ -50,7 +53,9 @@ func (p MetacriticProcessor) Execute(message *discordgo.MessageCreate, session *
 
 	_, err = session.ChannelMessageSend(message.ChannelID, sb.String())
 	if err != nil {
-		log.Error().Err(err).Str("metacritic", "failed to send message to channel").Send()
+		logrus.
+			WithField("command", "metacritic").
+			Error("failed to send message to channel")
 	}
 }
 
@@ -72,4 +77,9 @@ func getRSSUrl(message string, cfg *config.Config) string {
 	}
 
 	return ""
+}
+
+// WithConfig setup config pointer
+func (p *MetacriticCommand) WithConfig(cfg *config.Config) {
+	p.config = cfg
 }

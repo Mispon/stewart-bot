@@ -2,17 +2,20 @@ package commands
 
 import (
 	"fmt"
-	"github.com/Mispon/stewart-bot/internal/config"
-	"github.com/Mispon/stewart-bot/internal/utils"
 	"math/rand"
 	"strings"
 
 	"github.com/antchfx/htmlquery"
 	"github.com/bwmarrin/discordgo"
-	"github.com/rs/zerolog/log"
+	"github.com/sirupsen/logrus"
+
+	"github.com/mispon/stewart-bot/internal/config"
+	"github.com/mispon/stewart-bot/internal/utils"
 )
 
-type HoroscopeProcessor struct{}
+type HoroscopeCommand struct {
+	config *config.Config
+}
 
 type HoroscopeItem struct {
 	Header  string
@@ -24,23 +27,22 @@ func (h HoroscopeItem) String() string {
 }
 
 // Check checks if a module needs to be executed
-func (p HoroscopeProcessor) Check(message *discordgo.MessageCreate, askedMe bool) bool {
-	cfg := config.GetConfig()
-	return askedMe && utils.HasAnyOf(message.Content, cfg.Commands.Horoscope)
+func (p HoroscopeCommand) Check(message *discordgo.MessageCreate, askedMe bool) bool {
+	return askedMe && utils.HasAnyOf(message.Content, p.config.Commands.Horoscope)
 }
 
 // Execute runs module logic
-func (p HoroscopeProcessor) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
-	cfg := config.GetConfig()
-
-	horoscope := getHoroscope(cfg.HoroscopeUrl)
+func (p HoroscopeCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
+	horoscope := getHoroscope(p.config.HoroscopeUrl)
 
 	ri := rand.Intn(len(horoscope))
 	rh := fmt.Sprintf("%v", horoscope[ri])
 
 	_, err := session.ChannelMessageSend(message.ChannelID, rh)
 	if err != nil {
-		log.Error().Err(err).Str("horoscope", "failed to send message to channel").Send()
+		logrus.
+			WithField("command", "horoscope").
+			Error("horoscope", "failed to send message to channel")
 	}
 }
 
@@ -48,7 +50,9 @@ func (p HoroscopeProcessor) Execute(message *discordgo.MessageCreate, session *d
 func getHoroscope(url string) (horoscope []HoroscopeItem) {
 	doc, err := htmlquery.LoadURL(url)
 	if err != nil {
-		log.Error().Err(err).Str("horoscope", "failed to get doc").Send()
+		logrus.
+			WithField("command", "horoscope").
+			Error("failed to get doc")
 	}
 
 	entry := htmlquery.FindOne(doc, "//div[@class='entry']")
@@ -66,4 +70,9 @@ func getHoroscope(url string) (horoscope []HoroscopeItem) {
 	}
 
 	return horoscope
+}
+
+// WithConfig setup config pointer
+func (p *HoroscopeCommand) WithConfig(cfg *config.Config) {
+	p.config = cfg
 }

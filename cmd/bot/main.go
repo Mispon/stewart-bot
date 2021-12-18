@@ -2,62 +2,50 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"github.com/Mispon/stewart-bot/internal/commands"
-	"github.com/Mispon/stewart-bot/internal/config"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"syscall"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/sirupsen/logrus"
+
+	stewart "github.com/mispon/stewart-bot/internal/bot"
+	"github.com/mispon/stewart-bot/internal/config"
 )
 
 var (
-	DebugMode  bool
-	Token      string
-	ConfigPath string
+	debug bool
+	token string
 )
 
 func init() {
-	flag.BoolVar(&DebugMode, "debug", false, "-debug")
-	flag.StringVar(&Token, "token", "", "-token=my_bot_token")
-	flag.StringVar(&ConfigPath, "config", "config.yml", "-config=config.yml")
+	flag.BoolVar(&debug, "debug", false, "--debug")
+	flag.StringVar(&token, "token", "", "--token=my_bot_token")
 
 	flag.Parse()
+
+	if debug {
+		logrus.SetLevel(logrus.DebugLevel)
+	} else {
+		logrus.SetLevel(logrus.InfoLevel)
+	}
 }
 
 func main() {
-	fmt.Println("Initialize bot...")
-	cfgPath, _ := filepath.Abs(ConfigPath)
+	logrus.Infoln("Initialize bot...")
 
-	if DebugMode {
-		fmt.Printf("Config: %s\n", cfgPath)
-		fmt.Printf("Token: %s\n", Token)
-	}
-
-	config.ReadConfig(cfgPath)
-
-	discord, err := discordgo.New("Bot " + Token)
+	cfg, err := config.ReadConfig("config.yaml")
 	if err != nil {
-		fmt.Println(err)
-		return
+		logrus.Fatal(err)
 	}
 
-	discord.Identify.Intents = discordgo.IntentsGuildMessages
-	discord.AddHandler(commands.OnMessage)
-
-	err = discord.Open()
-	if err != nil {
-		fmt.Println(err)
-		return
+	bot := stewart.New(cfg, token)
+	if err := bot.Run(); err != nil {
+		logrus.Fatal(err)
 	}
-
-	fmt.Printf("Stewart v%s successfully started!", config.GetConfig().Version)
 
 	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
+	signal.Notify(sc, syscall.SIGINT, os.Interrupt)
 	<-sc
 
-	discord.Close()
+	bot.Close()
 }

@@ -1,40 +1,43 @@
 package commands
 
 import (
-	"github.com/Mispon/stewart-bot/internal/config"
-	utils2 "github.com/Mispon/stewart-bot/internal/utils"
 	"io/ioutil"
 	"strings"
 
-	"github.com/rs/zerolog/log"
+	"github.com/bwmarrin/discordgo"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/mispon/stewart-bot/internal/config"
+	"github.com/mispon/stewart-bot/internal/utils"
 )
 
-type JokeProcessor struct{}
+type JokeCommand struct {
+	config *config.Config
+}
 
 // Check checks if a module needs to be executed
-func (p JokeProcessor) Check(message *discordgo.MessageCreate, wasAsked bool) bool {
-	cfg := config.GetConfig()
-	return wasAsked && utils2.HasAnyOf(message.Content, cfg.Commands.Joke)
+func (p JokeCommand) Check(message *discordgo.MessageCreate, wasAsked bool) bool {
+	return wasAsked && utils.HasAnyOf(message.Content, p.config.Commands.Joke)
 }
 
 // Execute runs module logic
-func (p JokeProcessor) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
-	cfg := config.GetConfig()
-
-	res, err := utils2.MakeHTTPRequest(cfg.JokeUrl)
+func (p JokeCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
+	res, err := utils.MakeHTTPRequest(p.config.JokeUrl)
 	if err != nil {
-		log.Error().Err(err).Msgf("failed to make request %s to API", cfg.JokeUrl)
+		logrus.
+			WithField("command", "joke").
+			Errorf("failed to make request %s to API", p.config.JokeUrl)
 		return
 	}
-	defer res.Body.Close()
+	defer utils.Close(res.Body.Close)
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Error().Err(err).Str("joke", "failed to read response body").Send()
+		logrus.
+			WithField("command", "joke").
+			Error("failed to read response body")
 		return
 	}
 
@@ -45,12 +48,21 @@ func (p JokeProcessor) Execute(message *discordgo.MessageCreate, session *discor
 	tr := transform.NewReader(strings.NewReader(text), charmap.Windows1251.NewDecoder())
 	buf, err := ioutil.ReadAll(tr)
 	if err != nil {
-		log.Error().Err(err).Str("joke", "failed to convert string to utf").Send()
+		logrus.
+			WithField("command", "joke").
+			Error("failed to convert string to utf")
 		return
 	}
 
 	_, err = session.ChannelMessageSend(message.ChannelID, string(buf))
 	if err != nil {
-		log.Error().Err(err).Str("joke", "failed to send message to channel").Send()
+		logrus.
+			WithField("command", "joke").
+			Error("failed to send message to channel")
 	}
+}
+
+// WithConfig setup config pointer
+func (p *JokeCommand) WithConfig(cfg *config.Config) {
+	p.config = cfg
 }

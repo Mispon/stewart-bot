@@ -1,9 +1,10 @@
 package config
 
 import (
-	"os"
-
+	"github.com/mispon/stewart-bot/internal/utils"
 	"gopkg.in/yaml.v2"
+	"os"
+	"path/filepath"
 )
 
 type Config struct {
@@ -24,25 +25,23 @@ type Config struct {
 	}
 }
 
-var config *Config
-
 // ReadConfig reads bot settings from yaml config
-func ReadConfig(path string) {
-	config = &Config{}
+func ReadConfig(name string) (config *Config, err error) {
+	path, err := filepath.Abs(name)
+	if err != nil {
+		return nil, err
+	}
 
 	file, err := os.Open(path)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	defer file.Close()
+	defer utils.Close(file.Close)
 
 	decoder := yaml.NewDecoder(file)
 	if err := decoder.Decode(&config); err != nil {
-		panic(err)
+		return nil, err
 	}
-}
 
-// GetConfig returns config instance
-func GetConfig() *Config {
-	return config
+	return config, nil
 }
