@@ -13,8 +13,15 @@ import (
 	"github.com/mispon/stewart-bot/internal/utils"
 )
 
-type HoroscopeCommand struct {
+type horoscopeCommand struct {
 	config *config.Config
+}
+
+// NewHoroscopeCmd creates new instance
+func NewHoroscopeCmd(config *config.Config) Command {
+	return &horoscopeCommand{
+		config: config,
+	}
 }
 
 type HoroscopeItem struct {
@@ -27,14 +34,15 @@ func (h HoroscopeItem) String() string {
 }
 
 // Check checks if a module needs to be executed
-func (p HoroscopeCommand) Check(message *discordgo.MessageCreate, askedMe bool) bool {
+func (p horoscopeCommand) Check(message *discordgo.MessageCreate, askedMe bool) bool {
 	return askedMe && utils.HasAnyOf(message.Content, p.config.Commands.Horoscope)
 }
 
 // Execute runs module logic
-func (p HoroscopeCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
+func (p horoscopeCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
 	horoscope := getHoroscope(p.config.HoroscopeUrl)
 
+	// TODO: returns right horoscope for user
 	ri := rand.Intn(len(horoscope))
 	rh := fmt.Sprintf("%v", horoscope[ri])
 
@@ -70,9 +78,4 @@ func getHoroscope(url string) (horoscope []HoroscopeItem) {
 	}
 
 	return horoscope
-}
-
-// WithConfig setup config pointer
-func (p *HoroscopeCommand) WithConfig(cfg *config.Config) {
-	p.config = cfg
 }

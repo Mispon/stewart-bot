@@ -25,17 +25,13 @@ func New(cfg *config.Config, token string) *Bot {
 		config: cfg,
 		token:  token,
 		commands: []commands.Command{
-			&commands.PingCommand{},
-			&commands.ClearCommand{},
-			&commands.JokeCommand{},
-			&commands.QuoteCommand{},
-			&commands.HoroscopeCommand{},
-			&commands.MetacriticCommand{},
+			commands.NewPingCmd(cfg),
+			commands.NewClearCmd(),
+			commands.NewJokeCmd(cfg),
+			commands.NewQuoteCmd(cfg),
+			commands.NewHoroscopeCmd(cfg),
+			commands.NewMetacriticCmd(cfg),
 		},
-	}
-
-	for _, cmd := range bot.commands {
-		cmd.WithConfig(cfg)
 	}
 
 	return bot

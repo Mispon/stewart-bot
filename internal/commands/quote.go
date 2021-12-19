@@ -12,17 +12,24 @@ import (
 	"github.com/mispon/stewart-bot/internal/utils"
 )
 
-type QuoteCommand struct {
+type quoteCommand struct {
 	config *config.Config
 }
 
+// NewQuoteCmd creates new instance
+func NewQuoteCmd(config *config.Config) Command {
+	return &quoteCommand{
+		config: config,
+	}
+}
+
 // Check checks if a module needs to be executed
-func (p QuoteCommand) Check(message *discordgo.MessageCreate, wasAsked bool) bool {
+func (p quoteCommand) Check(message *discordgo.MessageCreate, wasAsked bool) bool {
 	return wasAsked && utils.HasAnyOf(message.Content, p.config.Commands.Quote)
 }
 
 // Execute runs module logic
-func (p QuoteCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
+func (p quoteCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
 	res, err := utils.MakeHTTPRequest(p.config.QuoteUrl)
 	if err != nil {
 		logrus.
@@ -61,9 +68,4 @@ func (p QuoteCommand) Execute(message *discordgo.MessageCreate, session *discord
 			WithField("command", "quote").
 			Error("failed to send message to channel")
 	}
-}
-
-// WithConfig setup config pointer
-func (p *QuoteCommand) WithConfig(cfg *config.Config) {
-	p.config = cfg
 }

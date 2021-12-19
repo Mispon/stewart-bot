@@ -1,10 +1,11 @@
 package config
 
 import (
-	"github.com/mispon/stewart-bot/internal/utils"
 	"gopkg.in/yaml.v2"
 	"os"
 	"path/filepath"
+
+	"github.com/mispon/stewart-bot/internal/utils"
 )
 
 type Config struct {
@@ -22,7 +23,12 @@ type Config struct {
 	Metacritic   struct {
 		GamesUrl  string `yaml:"games_url"`
 		MoviesUrl string `yaml:"movies_url"`
-	}
+	} `yaml:"metacritic"`
+	Members []struct {
+		Id     string `yaml:"id"`
+		Name   string `yaml:"name"`
+		Zodiac string `yaml:"zodiac"`
+	} `yaml:"members"`
 }
 
 // ReadConfig reads bot settings from yaml config

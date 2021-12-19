@@ -13,17 +13,24 @@ import (
 	"github.com/mispon/stewart-bot/internal/utils"
 )
 
-type JokeCommand struct {
+type jokeCommand struct {
 	config *config.Config
 }
 
+// NewJokeCmd creates new instance
+func NewJokeCmd(config *config.Config) Command {
+	return &jokeCommand{
+		config: config,
+	}
+}
+
 // Check checks if a module needs to be executed
-func (p JokeCommand) Check(message *discordgo.MessageCreate, wasAsked bool) bool {
+func (p jokeCommand) Check(message *discordgo.MessageCreate, wasAsked bool) bool {
 	return wasAsked && utils.HasAnyOf(message.Content, p.config.Commands.Joke)
 }
 
 // Execute runs module logic
-func (p JokeCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
+func (p jokeCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
 	res, err := utils.MakeHTTPRequest(p.config.JokeUrl)
 	if err != nil {
 		logrus.
@@ -60,9 +67,4 @@ func (p JokeCommand) Execute(message *discordgo.MessageCreate, session *discordg
 			WithField("command", "joke").
 			Error("failed to send message to channel")
 	}
-}
-
-// WithConfig setup config pointer
-func (p *JokeCommand) WithConfig(cfg *config.Config) {
-	p.config = cfg
 }

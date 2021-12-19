@@ -13,17 +13,24 @@ import (
 	"github.com/mispon/stewart-bot/internal/utils"
 )
 
-type MetacriticCommand struct {
+type metacriticCommand struct {
 	config *config.Config
 }
 
+// NewMetacriticCmd creates new instance
+func NewMetacriticCmd(config *config.Config) Command {
+	return &metacriticCommand{
+		config: config,
+	}
+}
+
 // Check checks if a module needs to be executed
-func (p MetacriticCommand) Check(message *discordgo.MessageCreate, _ bool) bool {
+func (p metacriticCommand) Check(message *discordgo.MessageCreate, _ bool) bool {
 	return utils.HasAnyOf(message.Content, []string{"что нового"})
 }
 
 // Execute runs module logic
-func (p MetacriticCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
+func (p metacriticCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
 	rssUrl := getRSSUrl(message.Content, p.config)
 	if len(rssUrl) == 0 {
 		_, _ = session.ChannelMessageSend(message.ChannelID, "Уточни где? В играх, в фильмах?")
@@ -77,9 +84,4 @@ func getRSSUrl(message string, cfg *config.Config) string {
 	}
 
 	return ""
-}
-
-// WithConfig setup config pointer
-func (p *MetacriticCommand) WithConfig(cfg *config.Config) {
-	p.config = cfg
 }

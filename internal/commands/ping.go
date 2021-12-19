@@ -9,17 +9,24 @@ import (
 	"github.com/mispon/stewart-bot/internal/utils"
 )
 
-type PingCommand struct {
+type pingCommand struct {
 	config *config.Config
 }
 
+// NewPingCmd creates new instance
+func NewPingCmd(config *config.Config) Command {
+	return &pingCommand{
+		config: config,
+	}
+}
+
 // Check checks if a module needs to be executed
-func (p PingCommand) Check(message *discordgo.MessageCreate, _ bool) bool {
+func (p pingCommand) Check(message *discordgo.MessageCreate, _ bool) bool {
 	return utils.HasAnyOf(message.Content, []string{"ping", "pong"})
 }
 
 // Execute runs module logic
-func (p PingCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
+func (p pingCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
 	var answer string
 
 	if message.Content == "ping" {
@@ -27,11 +34,6 @@ func (p PingCommand) Execute(message *discordgo.MessageCreate, session *discordg
 	} else {
 		answer = fmt.Sprintf("%s ping!", p.config.Author)
 	}
-	
-	_, _ = session.ChannelMessageSend(message.ChannelID, answer)
-}
 
-// WithConfig setup config pointer
-func (p *PingCommand) WithConfig(cfg *config.Config) {
-	p.config = cfg
+	_, _ = session.ChannelMessageSend(message.ChannelID, answer)
 }

@@ -4,19 +4,23 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/sirupsen/logrus"
 
-	"github.com/mispon/stewart-bot/internal/config"
 	"github.com/mispon/stewart-bot/internal/utils"
 )
 
-type ClearCommand struct{}
+type clearCommand struct{}
+
+// NewClearCmd creates new instance
+func NewClearCmd() Command {
+	return &clearCommand{}
+}
 
 // Check checks if a module needs to be executed
-func (p ClearCommand) Check(message *discordgo.MessageCreate, askedMe bool) bool {
+func (p clearCommand) Check(message *discordgo.MessageCreate, askedMe bool) bool {
 	return askedMe && utils.HasAnyOf(message.Content, []string{"clear", "клир"})
 }
 
 // Execute runs module logic
-func (p ClearCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
+func (p clearCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
 	messages, err := session.ChannelMessages(message.ChannelID, 0, "", "", "")
 	if err != nil {
 		logrus.Error("failed to get messages from channel")
@@ -31,9 +35,4 @@ func (p ClearCommand) Execute(message *discordgo.MessageCreate, session *discord
 	if err != nil {
 		logrus.Error("failed to bulk delete all messages")
 	}
-}
-
-// WithConfig setup config pointer
-func (p *ClearCommand) WithConfig(*config.Config) {
-	// don't use
 }

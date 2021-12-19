@@ -18,7 +18,7 @@ var (
 )
 
 func init() {
-	flag.BoolVar(&debug, "debug", false, "--debug")
+	flag.BoolVar(&debug, "debug", false, "--debug=true")
 	flag.StringVar(&token, "token", "", "--token=my_bot_token")
 
 	flag.Parse()
