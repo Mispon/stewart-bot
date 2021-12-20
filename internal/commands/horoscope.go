@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -17,20 +18,32 @@ type horoscopeCommand struct {
 	config *config.Config
 }
 
-// NewHoroscopeCmd creates new instance
-func NewHoroscopeCmd(config *config.Config) Command {
+// NewHoroscopeCmd creates new instance of command
+func NewHoroscopeCmd(config *config.Config) JobCommand {
 	return &horoscopeCommand{
 		config: config,
 	}
 }
 
-type HoroscopeItem struct {
-	Header  string
-	Content string
+// TriggerTime returns job execution time
+func (p horoscopeCommand) TriggerTime() (h int, m int) {
+	return 9, 30
 }
 
-func (h HoroscopeItem) String() string {
-	return fmt.Sprintf("**%v**\n%v", strings.TrimSpace(h.Header), strings.TrimSpace(h.Content))
+// Run executes command from job
+func (p horoscopeCommand) Run(session *discordgo.Session) error {
+	ri := rand.Intn(len(p.config.Members))
+	member := p.config.Members[ri]
+
+	horoscope, ok := getPersonalHoroscope(p.config.HoroscopeUrl, member.Zodiac)
+	if !ok {
+		return errors.New(fmt.Sprintf("received empty horoscope for user %s", member.ID))
+	}
+
+	message := fmt.Sprintf("<@%s>,%s", member.ID, horoscope)
+	_, err := session.ChannelMessageSend(p.config.Options.MainChannelID, message)
+
+	return err
 }
 
 // Check checks if a module needs to be executed
@@ -40,13 +53,19 @@ func (p horoscopeCommand) Check(message *discordgo.MessageCreate, askedMe bool) 
 
 // Execute runs module logic
 func (p horoscopeCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
-	horoscope := getHoroscope(p.config.HoroscopeUrl)
+	zodiac, ok := p.getUserZodiac(message.Author.ID)
+	if !ok {
+		_, _ = session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("user %s not found in config members list", message.Author.ID))
+		return
+	}
 
-	// TODO: returns right horoscope for user
-	ri := rand.Intn(len(horoscope))
-	rh := fmt.Sprintf("%v", horoscope[ri])
+	horoscope, ok := getPersonalHoroscope(p.config.HoroscopeUrl, zodiac)
+	if !ok {
+		_, _ = session.ChannelMessageSend(message.ChannelID, fmt.Sprintf(`horoscope for "%s" not found`, zodiac))
+		return
+	}
 
-	_, err := session.ChannelMessageSend(message.ChannelID, rh)
+	_, err := session.ChannelMessageSend(message.ChannelID, horoscope.String())
 	if err != nil {
 		logrus.
 			WithField("command", "horoscope").
@@ -54,8 +73,30 @@ func (p horoscopeCommand) Execute(message *discordgo.MessageCreate, session *dis
 	}
 }
 
-// getHoroscope returns list of daily horoscopes
-func getHoroscope(url string) (horoscope []HoroscopeItem) {
+// getPersonalHoroscope returns personal horoscope by zodiac
+func getPersonalHoroscope(url, zodiac string) (*horoscopeItem, bool) {
+	full := getFullHoroscope(url)
+
+	var result horoscopeItem
+	for _, h := range full {
+		if h.Header == zodiac {
+			result = h
+			break
+		}
+	}
+
+	if len(result.Content) == 0 {
+		logrus.
+			WithField("command", "horoscope").
+			Warnf(`horoscope for "%s" not found!`, zodiac)
+		return nil, false
+	}
+
+	return &result, true
+}
+
+// getFullHoroscope returns list of daily horoscopes
+func getFullHoroscope(url string) (horoscope []horoscopeItem) {
 	doc, err := htmlquery.LoadURL(url)
 	if err != nil {
 		logrus.
@@ -68,14 +109,33 @@ func getHoroscope(url string) (horoscope []HoroscopeItem) {
 	contents := htmlquery.Find(entry, "//p")
 	count := len(headers) - 1
 
-	horoscope = make([]HoroscopeItem, count)
+	horoscope = make([]horoscopeItem, count)
 	for i := 0; i < count; i++ {
-		hi := HoroscopeItem{
-			Header:  htmlquery.InnerText(headers[i]),
-			Content: htmlquery.InnerText(contents[i]),
+		hi := horoscopeItem{
+			Header:  strings.TrimSpace(htmlquery.InnerText(headers[i])),
+			Content: strings.TrimSpace(htmlquery.InnerText(contents[i])),
 		}
 		horoscope[i] = hi
 	}
 
 	return horoscope
+}
+
+func (p *horoscopeCommand) getUserZodiac(authorID string) (string, bool) {
+	for _, member := range p.config.Members {
+		if member.ID == authorID {
+			return member.Zodiac, true
+		}
+	}
+
+	return "", false
+}
+
+type horoscopeItem struct {
+	Header  string
+	Content string
+}
+
+func (h horoscopeItem) String() string {
+	return fmt.Sprintf("**%s**\n%s", strings.TrimSpace(h.Header), strings.TrimSpace(h.Content))
 }

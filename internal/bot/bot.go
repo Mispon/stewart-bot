@@ -16,7 +16,8 @@ type Bot struct {
 	config   *config.Config
 	token    string
 	commands []commands.Command
-	session  *discordgo.Session
+
+	Session *discordgo.Session
 }
 
 // New creates new bot instance
@@ -52,14 +53,10 @@ func (b *Bot) Run() error {
 		return err
 	}
 
-	b.session = discord
+	b.Session = discord
 
 	logrus.Infof("Stewart-bot v%s successfully started!", b.config.Version)
 	return nil
-}
-
-func (b *Bot) Close() {
-	utils.Close(b.session.Close)
 }
 
 // onMessage Handle chat commands
@@ -94,4 +91,10 @@ func (b *Bot) askedMe(content string) bool {
 		}
 	}
 	return false
+}
+
+// Close terminates bot session
+func (b *Bot) Close() {
+	logrus.Debug("terminating bot session...")
+	utils.Close(b.Session.Close)
 }
