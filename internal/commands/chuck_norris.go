@@ -15,7 +15,7 @@ type (
 	}
 
 	jokeBody struct {
-		value string
+		Value string `json:"value"`
 	}
 )
 
@@ -52,7 +52,7 @@ func (p chuckCommand) Execute(message *discordgo.MessageCreate, session *discord
 		return
 	}
 
-	_, err = session.ChannelMessageSend(message.ChannelID, joke.value)
+	_, err = session.ChannelMessageSend(message.ChannelID, joke.Value)
 	if err != nil {
 		logrus.WithField("command", "chuck").Error("failed to send message to channel")
 	}
