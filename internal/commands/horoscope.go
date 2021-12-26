@@ -67,9 +67,7 @@ func (p horoscopeCommand) Execute(message *discordgo.MessageCreate, session *dis
 
 	_, err := session.ChannelMessageSend(message.ChannelID, horoscope.String())
 	if err != nil {
-		logrus.
-			WithField("command", "horoscope").
-			Error("horoscope", "failed to send message to channel")
+		logrus.WithField("command", "horoscope").Error("horoscope", "failed to send message to channel")
 	}
 }
 
@@ -86,9 +84,7 @@ func getPersonalHoroscope(url, zodiac string) (*horoscopeItem, bool) {
 	}
 
 	if len(result.Content) == 0 {
-		logrus.
-			WithField("command", "horoscope").
-			Warnf(`horoscope for "%s" not found!`, zodiac)
+		logrus.WithField("command", "horoscope").Warnf(`horoscope for "%s" not found!`, zodiac)
 		return nil, false
 	}
 
@@ -99,9 +95,7 @@ func getPersonalHoroscope(url, zodiac string) (*horoscopeItem, bool) {
 func getFullHoroscope(url string) (horoscope []horoscopeItem) {
 	doc, err := htmlquery.LoadURL(url)
 	if err != nil {
-		logrus.
-			WithField("command", "horoscope").
-			Error("failed to get doc")
+		logrus.WithField("command", "horoscope").Error("failed to get doc")
 	}
 
 	entry := htmlquery.FindOne(doc, "//div[@class='entry']")

@@ -18,10 +18,11 @@ type (
 			Quote     []string `yaml:"quote"`
 			Horoscope []string `yaml:"horoscope"`
 		} `yaml:"commands"`
-		JokeUrl      string `yaml:"joke_url"`
-		QuoteUrl     string `yaml:"quote_url"`
-		HoroscopeUrl string `yaml:"horoscope_url"`
-		Metacritic   struct {
+		JokeUrl        string `yaml:"joke_url"`
+		QuoteUrl       string `yaml:"quote_url"`
+		HoroscopeUrl   string `yaml:"horoscope_url"`
+		ChuckNorrisUrl string `yaml:"chuck_norris_url"`
+		Metacritic     struct {
 			GamesUrl  string `yaml:"games_url"`
 			MoviesUrl string `yaml:"movies_url"`
 		} `yaml:"metacritic"`

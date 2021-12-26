@@ -10,6 +10,7 @@ commands:
 joke_url: "http://rzhunemogu.ru/RandJSON.aspx?CType=1"
 quote_url: "https://api.forismatic.com/api/1.0/?method=getQuote&format=json"
 horoscope_url: "https://www.stardm.com/daily-horoscopes/Y-russian-daily-horoscopes.asp"
+chuck_norris_url: "https://api.chucknorris.io/jokes/random"
 
 metacritic:
   games_url: "https://www.metacritic.com/rss/games/pc"

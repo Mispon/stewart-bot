@@ -41,9 +41,7 @@ func (p metacriticCommand) Execute(message *discordgo.MessageCreate, session *di
 	feed, err := fp.ParseURL(rssUrl)
 	if err != nil {
 		_, _ = session.ChannelMessageSend(message.ChannelID, err.Error())
-		logrus.
-			WithField("command", "metacritic").
-			Error("failed to parse RSS url")
+		logrus.WithField("command", "metacritic").Error("failed to parse RSS url")
 		return
 	}
 
@@ -60,9 +58,7 @@ func (p metacriticCommand) Execute(message *discordgo.MessageCreate, session *di
 
 	_, err = session.ChannelMessageSend(message.ChannelID, sb.String())
 	if err != nil {
-		logrus.
-			WithField("command", "metacritic").
-			Error("failed to send message to channel")
+		logrus.WithField("command", "metacritic").Error("failed to send message to channel")
 	}
 }
 

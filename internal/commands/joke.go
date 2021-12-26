@@ -33,18 +33,14 @@ func (p jokeCommand) Check(message *discordgo.MessageCreate, wasAsked bool) bool
 func (p jokeCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
 	res, err := utils.MakeHTTPRequest(p.config.JokeUrl)
 	if err != nil {
-		logrus.
-			WithField("command", "joke").
-			Errorf("failed to make request %s to API", p.config.JokeUrl)
+		logrus.WithField("command", "joke").Errorf("failed to make request %s", p.config.JokeUrl)
 		return
 	}
 	defer utils.Close(res.Body.Close)
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		logrus.
-			WithField("command", "joke").
-			Error("failed to read response body")
+		logrus.WithField("command", "joke").Error("failed to read response body")
 		return
 	}
 
@@ -55,16 +51,12 @@ func (p jokeCommand) Execute(message *discordgo.MessageCreate, session *discordg
 	tr := transform.NewReader(strings.NewReader(text), charmap.Windows1251.NewDecoder())
 	buf, err := ioutil.ReadAll(tr)
 	if err != nil {
-		logrus.
-			WithField("command", "joke").
-			Error("failed to convert string to utf")
+		logrus.WithField("command", "joke").Error("failed to convert string to utf")
 		return
 	}
 
 	_, err = session.ChannelMessageSend(message.ChannelID, string(buf))
 	if err != nil {
-		logrus.
-			WithField("command", "joke").
-			Error("failed to send message to channel")
+		logrus.WithField("command", "joke").Error("failed to send message to channel")
 	}
 }

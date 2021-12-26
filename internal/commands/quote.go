@@ -32,18 +32,14 @@ func (p quoteCommand) Check(message *discordgo.MessageCreate, wasAsked bool) boo
 func (p quoteCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
 	res, err := utils.MakeHTTPRequest(p.config.QuoteUrl)
 	if err != nil {
-		logrus.
-			WithField("command", "quote").
-			Errorf("failed to make request %s", p.config.QuoteUrl)
+		logrus.WithField("command", "quote").Errorf("failed to make request %s", p.config.QuoteUrl)
 		return
 	}
 	defer utils.Close(res.Body.Close)
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		logrus.
-			WithField("command", "quote").
-			Error("failed to read response body")
+		logrus.WithField("command", "quote").Error("failed to read response body")
 		return
 	}
 
@@ -52,9 +48,7 @@ func (p quoteCommand) Execute(message *discordgo.MessageCreate, session *discord
 		QuoteAuthor string
 	}{}
 	if err = json.Unmarshal(body, &quote); err != nil {
-		logrus.
-			WithField("command", "quote").
-			Error("failed to deserialize json body")
+		logrus.WithField("command", "quote").Error("failed to deserialize json body")
 	}
 
 	text := fmt.Sprintf(`*%s*`, quote.QuoteText)
@@ -64,8 +58,6 @@ func (p quoteCommand) Execute(message *discordgo.MessageCreate, session *discord
 
 	_, err = session.ChannelMessageSend(message.ChannelID, text)
 	if err != nil {
-		logrus.
-			WithField("command", "quote").
-			Error("failed to send message to channel")
+		logrus.WithField("command", "quote").Error("failed to send message to channel")
 	}
 }
