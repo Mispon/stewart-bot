@@ -21,8 +21,8 @@ func NewPingCmd(config *config.Config) Command {
 }
 
 // Check checks if a module needs to be executed
-func (p pingCommand) Check(message *discordgo.MessageCreate, _ bool) bool {
-	return utils.HasAnyOf(message.Content, p.config.Commands.Ping.Triggers)
+func (p pingCommand) Check(message *discordgo.MessageCreate, wasAsked bool) bool {
+	return wasAsked && utils.HasAnyOf(message.Content, p.config.Commands.Ping.Triggers)
 }
 
 // Execute runs module logic

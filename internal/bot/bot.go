@@ -91,6 +91,7 @@ func (b *Bot) askedMe(content string) bool {
 	words := strings.Split(content, " ")
 
 	for _, word := range words {
+		word = strings.ToLower(word)
 		if utils.IndexOf(word, b.config.BotNames) >= 0 {
 			return true
 		}

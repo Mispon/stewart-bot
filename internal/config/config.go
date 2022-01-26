@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -59,12 +58,7 @@ type (
 
 // ReadConfig reads bot settings from yaml config
 func ReadConfig(name string, opts ...OptionsFn) (config *Config, err error) {
-	path, err := filepath.Abs(name)
-	if err != nil {
-		return nil, err
-	}
-
-	file, err := os.Open(path)
+	file, err := os.Open(name)
 	if err != nil {
 		return nil, err
 	}
