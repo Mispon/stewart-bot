@@ -3,8 +3,9 @@ package balaboba
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/mispon/stewart-bot/internal/utils"
 	"io/ioutil"
+
+	"github.com/mispon/stewart-bot/internal/utils"
 )
 
 type (
