@@ -26,13 +26,16 @@ func New(cfg *config.Config, token string) *Bot {
 		config: cfg,
 		token:  token,
 		commands: []commands.Command{
+			commands.NewHelpCmd(cfg),
 			commands.NewPingCmd(cfg),
 			commands.NewClearCmd(),
 			commands.NewJokeCmd(cfg),
 			commands.NewQuoteCmd(cfg),
-			commands.NewHoroscopeCmd(cfg),
+			commands.NewDudeQuoteCmd(cfg),
+			commands.NewHoroscopeV2Cmd(cfg),
 			commands.NewMetacriticCmd(cfg),
 			commands.NewChuckCmd(cfg),
+			commands.NewDialogueCmd(cfg),
 		},
 	}
 
@@ -72,6 +75,7 @@ func (b *Bot) onMessage(session *discordgo.Session, message *discordgo.MessageCr
 	for _, cmd := range b.commands {
 		if cmd.Check(message, askedMe) {
 			cmd.Execute(message, session)
+			break
 		}
 	}
 }

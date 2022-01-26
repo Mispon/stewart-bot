@@ -1,9 +1,9 @@
 package job
 
 import (
-	"github.com/bwmarrin/discordgo"
 	"time"
 
+	"github.com/bwmarrin/discordgo"
 	"github.com/sirupsen/logrus"
 
 	"github.com/mispon/stewart-bot/internal/commands"
@@ -22,7 +22,7 @@ func New(session *discordgo.Session, cfg *config.Config) *cronJob {
 		session: session,
 		config:  cfg,
 		jobs: []commands.JobCommand{
-			commands.NewHoroscopeCmd(cfg),
+			commands.NewHoroscopeV2Cmd(cfg),
 		},
 	}
 }

@@ -35,7 +35,7 @@ func (p horoscopeCommand) Run(session *discordgo.Session) error {
 	ri := rand.Intn(len(p.config.Members))
 	member := p.config.Members[ri]
 
-	horoscope, ok := getPersonalHoroscope(p.config.HoroscopeUrl, member.Zodiac)
+	horoscope, ok := p.getPersonalHoroscope(p.config.HoroscopeUrl, member.Zodiac)
 	if !ok {
 		return errors.New(fmt.Sprintf("received empty horoscope for user %s", member.ID))
 	}
@@ -48,7 +48,7 @@ func (p horoscopeCommand) Run(session *discordgo.Session) error {
 
 // Check checks if a module needs to be executed
 func (p horoscopeCommand) Check(message *discordgo.MessageCreate, askedMe bool) bool {
-	return askedMe && utils.HasAnyOf(message.Content, p.config.Commands.Horoscope)
+	return askedMe && utils.HasAnyOf(message.Content, p.config.Commands.Horoscope.Triggers)
 }
 
 // Execute runs module logic
@@ -59,7 +59,7 @@ func (p horoscopeCommand) Execute(message *discordgo.MessageCreate, session *dis
 		return
 	}
 
-	horoscope, ok := getPersonalHoroscope(p.config.HoroscopeUrl, zodiac)
+	horoscope, ok := p.getPersonalHoroscope(p.config.HoroscopeUrl, zodiac)
 	if !ok {
 		_, _ = session.ChannelMessageSend(message.ChannelID, fmt.Sprintf(`horoscope for "%s" not found`, zodiac))
 		return
@@ -72,8 +72,8 @@ func (p horoscopeCommand) Execute(message *discordgo.MessageCreate, session *dis
 }
 
 // getPersonalHoroscope returns personal horoscope by zodiac
-func getPersonalHoroscope(url, zodiac string) (*horoscopeItem, bool) {
-	full := getFullHoroscope(url)
+func (p horoscopeCommand) getPersonalHoroscope(url, zodiac string) (*horoscopeItem, bool) {
+	full := p.getFullHoroscope(url)
 
 	var result horoscopeItem
 	for _, h := range full {
@@ -92,7 +92,7 @@ func getPersonalHoroscope(url, zodiac string) (*horoscopeItem, bool) {
 }
 
 // getFullHoroscope returns list of daily horoscopes
-func getFullHoroscope(url string) (horoscope []horoscopeItem) {
+func (p horoscopeCommand) getFullHoroscope(url string) (horoscope []horoscopeItem) {
 	doc, err := htmlquery.LoadURL(url)
 	if err != nil {
 		logrus.WithField("command", "horoscope").Error("failed to get doc")

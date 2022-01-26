@@ -25,12 +25,12 @@ func NewQuoteCmd(config *config.Config) Command {
 
 // Check checks if a module needs to be executed
 func (p quoteCommand) Check(message *discordgo.MessageCreate, wasAsked bool) bool {
-	return wasAsked && utils.HasAnyOf(message.Content, p.config.Commands.Quote)
+	return wasAsked && utils.HasAnyOf(message.Content, p.config.Commands.Quote.Triggers)
 }
 
 // Execute runs module logic
 func (p quoteCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
-	res, err := utils.MakeHTTPRequest(p.config.QuoteUrl)
+	res, err := utils.SendGet(p.config.QuoteUrl)
 	if err != nil {
 		logrus.WithField("command", "quote").Errorf("failed to make request %s", p.config.QuoteUrl)
 		return
@@ -51,7 +51,7 @@ func (p quoteCommand) Execute(message *discordgo.MessageCreate, session *discord
 		logrus.WithField("command", "quote").Error("failed to deserialize json body")
 	}
 
-	text := fmt.Sprintf(`*%s*`, quote.QuoteText)
+	text := fmt.Sprintf(`%s`, quote.QuoteText)
 	if len(quote.QuoteAuthor) > 0 {
 		text += fmt.Sprintf("\n%s", quote.QuoteAuthor)
 	}

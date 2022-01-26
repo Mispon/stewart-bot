@@ -3,14 +3,36 @@ version: "1.0.0"
 bot_names: [ "stew", "стю" ]
 
 commands:
-  joke: [ "шутк", "шути", "рофл", "ржаку", "прекол" ]
-  quote: [ "цитат", "мудро", "ебани" ]
-  horoscope: [ "гороскоп", "вангуй" ]
+  joke:
+    triggers: ["шутк", "шути", "рофл", "ржаку", "прекол"]
+    info: "Шутканет тупую шутку"
+  quote:
+    triggers: ["цитат", "мудро"]
+    info: "Выдаст жизненную мудрость"
+  dude_quote:
+    triggers: ["ебани"]
+    info: "Ебанет пацанскую цитату"
+  horoscope:
+    triggers: ["гороскоп", "вангуй"]
+    info: "Спрогнозирует гороскоп на день"
+  chuck:
+    triggers: ["chuck", "чак"]
+    info: "Скажет факт про Чакка Норриса (eng)"
+  metacritic:
+    triggers: ["что нового"]
+    info: "(игр | кино, фильм) - выдаст новиночки с метакритика"
+  ping:
+    triggers: ["доложить", "живой"]
+    info: "Проверка состояния"
+  help:
+    triggers: ["help", "умеешь", "можешь"]
+    info: "Список доступных команд"
 
 joke_url: "http://rzhunemogu.ru/RandJSON.aspx?CType=1"
 quote_url: "https://api.forismatic.com/api/1.0/?method=getQuote&format=json"
 horoscope_url: "https://www.stardm.com/daily-horoscopes/Y-russian-daily-horoscopes.asp"
 chuck_norris_url: "https://api.chucknorris.io/jokes/random"
+balaboba_url: "https://yandex.ru/lab/api/yalm/text3"
 
 metacritic:
   games_url: "https://www.metacritic.com/rss/games/pc"

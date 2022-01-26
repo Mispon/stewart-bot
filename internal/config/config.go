@@ -1,27 +1,41 @@
 package config
 
 import (
-	"gopkg.in/yaml.v2"
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
+
+	"gopkg.in/yaml.v2"
 
 	"github.com/mispon/stewart-bot/internal/utils"
 )
 
 type (
+	BotCommand struct {
+		Triggers []string `yaml:"triggers"`
+		Info     string   `yaml:"info"`
+	}
+
 	Config struct {
 		Author   string   `yaml:"author"`
 		Version  string   `yaml:"version"`
 		BotNames []string `yaml:"bot_names"`
 		Commands struct {
-			Joke      []string `yaml:"joke"`
-			Quote     []string `yaml:"quote"`
-			Horoscope []string `yaml:"horoscope"`
+			Joke       BotCommand `yaml:"joke"`
+			Quote      BotCommand `yaml:"quote"`
+			DudeQuote  BotCommand `yaml:"dude_quote"`
+			Horoscope  BotCommand `yaml:"horoscope"`
+			Chuck      BotCommand `yaml:"chuck"`
+			Metacritic BotCommand `yaml:"metacritic"`
+			Ping       BotCommand `yaml:"ping"`
+			Help       BotCommand `yaml:"help"`
 		} `yaml:"commands"`
 		JokeUrl        string `yaml:"joke_url"`
 		QuoteUrl       string `yaml:"quote_url"`
 		HoroscopeUrl   string `yaml:"horoscope_url"`
 		ChuckNorrisUrl string `yaml:"chuck_norris_url"`
+		BalabobaUrl    string `yaml:"balaboba_url"`
 		Metacritic     struct {
 			GamesUrl  string `yaml:"games_url"`
 			MoviesUrl string `yaml:"movies_url"`
@@ -84,4 +98,8 @@ func WithVoiceChannelID(voiceChannelID string) OptionsFn {
 	return func(o *Options) {
 		o.VoiceChannelID = voiceChannelID
 	}
+}
+
+func (b BotCommand) String() string {
+	return fmt.Sprintf("\t[%s] %s\n", strings.Join(b.Triggers, ", "), b.Info)
 }

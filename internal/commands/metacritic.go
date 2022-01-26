@@ -26,7 +26,7 @@ func NewMetacriticCmd(config *config.Config) Command {
 
 // Check checks if a module needs to be executed
 func (p metacriticCommand) Check(message *discordgo.MessageCreate, _ bool) bool {
-	return utils.HasAnyOf(message.Content, []string{"что нового"})
+	return utils.HasAnyOf(message.Content, p.config.Commands.Metacritic.Triggers)
 }
 
 // Execute runs module logic

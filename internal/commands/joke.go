@@ -26,12 +26,12 @@ func NewJokeCmd(config *config.Config) Command {
 
 // Check checks if a module needs to be executed
 func (p jokeCommand) Check(message *discordgo.MessageCreate, wasAsked bool) bool {
-	return wasAsked && utils.HasAnyOf(message.Content, p.config.Commands.Joke)
+	return wasAsked && utils.HasAnyOf(message.Content, p.config.Commands.Joke.Triggers)
 }
 
 // Execute runs module logic
 func (p jokeCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
-	res, err := utils.MakeHTTPRequest(p.config.JokeUrl)
+	res, err := utils.SendGet(p.config.JokeUrl)
 	if err != nil {
 		logrus.WithField("command", "joke").Errorf("failed to make request %s", p.config.JokeUrl)
 		return

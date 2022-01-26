@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"fmt"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 
@@ -22,18 +22,16 @@ func NewPingCmd(config *config.Config) Command {
 
 // Check checks if a module needs to be executed
 func (p pingCommand) Check(message *discordgo.MessageCreate, _ bool) bool {
-	return utils.HasAnyOf(message.Content, []string{"ping", "pong"})
+	return utils.HasAnyOf(message.Content, p.config.Commands.Ping.Triggers)
 }
 
 // Execute runs module logic
 func (p pingCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
 	var answer string
-
-	if message.Content == "ping" {
-		answer = fmt.Sprintf("%s pong!", p.config.Author)
+	if strings.Contains(message.Content, "доложить") {
+		answer = "Служу KR4K3Nу!"
 	} else {
-		answer = fmt.Sprintf("%s ping!", p.config.Author)
+		answer = "Так точно!"
 	}
-
 	_, _ = session.ChannelMessageSend(message.ChannelID, answer)
 }
