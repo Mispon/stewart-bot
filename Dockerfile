@@ -5,15 +5,15 @@ COPY go.mod .
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o /main main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o /stewart-bot cmd/bot/main.go
 
 FROM scratch
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder main /bin/main
+COPY --from=builder stewart-bot /bin/stewart-bot
 
 ENV STW_TOKEN=""
 ENV STEW_SERVER_ID=""
 ENV STEW_MAIN_CH=""
 ENV STEW_VOICE_CH=""
 
-ENTRYPOINT ["/bin/main"]
+ENTRYPOINT ["/bin/stewart-bot"]
