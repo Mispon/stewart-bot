@@ -28,7 +28,7 @@ func NewHoroscopeV2Cmd(config *config.Config) JobCommand {
 
 // TriggerTime returns job execution time
 func (p horoscopeCommandV2) TriggerTime() (h int, m int) {
-	return 9, 30
+	return 6, 30 // UTC
 }
 
 // Run executes command from job

@@ -41,6 +41,7 @@ func (p helpCommand) GetHelpMessage() string {
 	result += fmt.Sprintf("имена: %s\n", strings.Join(p.cfg.BotNames, ", "))
 	result += p.cfg.Commands.Help.String()
 	result += p.cfg.Commands.Ping.String()
+	result += p.cfg.Commands.Thanks.String()
 	result += p.cfg.Commands.Joke.String()
 	result += p.cfg.Commands.Horoscope.String()
 	result += p.cfg.Commands.Quote.String()

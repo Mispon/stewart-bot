@@ -29,7 +29,7 @@ func (p pingCommand) Check(message *discordgo.MessageCreate, wasAsked bool) bool
 func (p pingCommand) Execute(message *discordgo.MessageCreate, session *discordgo.Session) {
 	var answer string
 	if strings.Contains(message.Content, "доложить") {
-		answer = "Служу KR4K3Nу!"
+		answer = "Стою прямо, смотрю прямо!"
 	} else {
 		answer = "Так точно!"
 	}

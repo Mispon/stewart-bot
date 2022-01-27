@@ -21,11 +21,14 @@ commands:
   metacritic:
     triggers: ["что нового"]
     info: "(игр | кино, фильм) - выдаст новиночки с метакритика"
+  thanks:
+    triggers: [ "благодарность" ]
+    info: "Объявить благодарность"
   ping:
     triggers: ["доложить", "живой"]
     info: "Проверка состояния"
   help:
-    triggers: ["help", "умеешь", "можешь"]
+    triggers: ["help", "умеешь"]
     info: "Список доступных команд"
 
 joke_url: "http://rzhunemogu.ru/RandJSON.aspx?CType=1"

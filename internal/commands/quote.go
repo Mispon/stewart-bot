@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/sirupsen/logrus"
@@ -51,7 +52,7 @@ func (p quoteCommand) Execute(message *discordgo.MessageCreate, session *discord
 		logrus.WithField("command", "quote").Error("failed to deserialize json body")
 	}
 
-	text := fmt.Sprintf(`%s`, quote.QuoteText)
+	text := fmt.Sprintf("*%s*", strings.TrimSpace(quote.QuoteText))
 	if len(quote.QuoteAuthor) > 0 {
 		text += fmt.Sprintf("\n%s", quote.QuoteAuthor)
 	}

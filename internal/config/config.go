@@ -27,6 +27,7 @@ type (
 			Horoscope  BotCommand `yaml:"horoscope"`
 			Chuck      BotCommand `yaml:"chuck"`
 			Metacritic BotCommand `yaml:"metacritic"`
+			Thanks     BotCommand `yaml:"thanks"`
 			Ping       BotCommand `yaml:"ping"`
 			Help       BotCommand `yaml:"help"`
 		} `yaml:"commands"`
@@ -95,5 +96,5 @@ func WithVoiceChannelID(voiceChannelID string) OptionsFn {
 }
 
 func (b BotCommand) String() string {
-	return fmt.Sprintf("\t[%s] %s\n", strings.Join(b.Triggers, ", "), b.Info)
+	return fmt.Sprintf("\t*[%s]* - %s\n", strings.Join(b.Triggers, ", "), b.Info)
 }

@@ -27,14 +27,15 @@ func New(cfg *config.Config, token string) *Bot {
 		token:  token,
 		commands: []commands.Command{
 			commands.NewHelpCmd(cfg),
-			commands.NewPingCmd(cfg),
-			commands.NewClearCmd(),
+			commands.NewDudeQuoteCmd(cfg),
 			commands.NewJokeCmd(cfg),
 			commands.NewQuoteCmd(cfg),
-			commands.NewDudeQuoteCmd(cfg),
 			commands.NewHoroscopeV2Cmd(cfg),
 			commands.NewMetacriticCmd(cfg),
 			commands.NewChuckCmd(cfg),
+			commands.NewPingCmd(cfg),
+			commands.NewThanksCmd(cfg),
+			commands.NewClearCmd(),
 			commands.NewDialogueCmd(cfg),
 		},
 	}

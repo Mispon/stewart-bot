@@ -55,7 +55,8 @@ func (p jokeCommand) Execute(message *discordgo.MessageCreate, session *discordg
 		return
 	}
 
-	_, err = session.ChannelMessageSend(message.ChannelID, string(buf))
+	joke := strings.TrimSpace(string(buf))
+	_, err = session.ChannelMessageSend(message.ChannelID, joke)
 	if err != nil {
 		logrus.WithField("command", "joke").Error("failed to send message to channel")
 	}
