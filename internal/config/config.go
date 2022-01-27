@@ -96,5 +96,5 @@ func WithVoiceChannelID(voiceChannelID string) OptionsFn {
 }
 
 func (b BotCommand) String() string {
-	return fmt.Sprintf("\t*[%s]* - %s\n", strings.Join(b.Triggers, ", "), b.Info)
+	return fmt.Sprintf("\t**[%s]** - %s\n", strings.Join(b.Triggers, ", "), b.Info)
 }
