@@ -20,7 +20,7 @@ func NewThanksCmd(config *config.Config) Command {
 
 // Check checks if a module needs to be executed
 func (p thanksCommand) Check(message *discordgo.MessageCreate, wasAsked bool) bool {
-	return wasAsked && utils.HasAnyOf(message.Content, p.config.Commands.Ping.Triggers)
+	return wasAsked && utils.HasAnyOf(message.Content, p.config.Commands.Thanks.Triggers)
 }
 
 // Execute runs module logic
