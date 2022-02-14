@@ -30,7 +30,7 @@ func New(cfg *config.Config, token string) *Bot {
 			commands.NewDudeQuoteCmd(cfg),
 			commands.NewJokeCmd(cfg),
 			commands.NewQuoteCmd(cfg),
-			commands.NewHoroscopeV2Cmd(cfg),
+			commands.NewHoroscopeCmd(cfg),
 			commands.NewMetacriticCmd(cfg),
 			commands.NewChuckCmd(cfg),
 			commands.NewPingCmd(cfg),
